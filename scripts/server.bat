@@ -1,0 +1,1 @@
+..\bin\pmtiles.exe serve ..\output\
