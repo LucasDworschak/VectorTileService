@@ -1,4 +1,4 @@
-# Vector Tile Servic
+# Vector Tile Service
 
 This repository provides the mean and manual to convert an osm file into vector tiles. This repo is specifically tailored for the alpine maps project where the main focus lies in providing up to date vector tiles for mountain peak labels. 
 

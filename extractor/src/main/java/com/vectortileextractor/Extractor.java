@@ -9,15 +9,24 @@ import com.onthegomap.planetiler.util.ZoomFunction;
 import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicLong;
 
+/*
+ * Code adapted from planetiler example:
+ * https://github.com/onthegomap/planetiler
+*/
 
 public class Extractor implements Profile {
 
-	private final AtomicLong peakNumber = new AtomicLong(0);
 
 	@Override
-	public void processFeature(SourceFeature sourceFeature, FeatureCollector features) {
+	public void processFeature(SourceFeature sourceFeature, FeatureCollector features)
+	{
 		// only allow peaks that at least have a name tag
-		if (sourceFeature.isPoint() && sourceFeature.hasTag("natural", "peak") && (sourceFeature.hasTag("name") || sourceFeature.hasTag("name:de"))) {
+		if (sourceFeature.isPoint() 												// GIVE US ONLY POINT DATA
+			&& sourceFeature.hasTag("natural", "peak") 								// GIVE US ALL PEAKS
+			&& (sourceFeature.hasTag("name") || sourceFeature.hasTag("name:de"))	// REQUIRED NAME OR GERMAN NAME
+			&& sourceFeature.hasTag("ele")  										// REQUIRED ELEVATION
+		)
+		{
 			String name;
 			if(sourceFeature.hasTag("name:de"))
 			{// prefer german names (if available)
@@ -29,7 +38,7 @@ public class Extractor implements Profile {
 			}
 
 			int elevation = 0;
-			// some features do not have elevations -> use 0
+			// some features do not have elevations -> use 0 (If is always true currently -> but if we also allow no elevation data -> than using this is necessary)
 			if(sourceFeature.hasTag("ele"))
 			{
 				// ele tag is encoded as a string that contains double precision values
@@ -44,19 +53,11 @@ public class Extractor implements Profile {
 				.setAttr("elevation", elevation)
 				.setId(sourceFeature.id())
 
-				// double the amount of features visible at every zoom level
-				// .setPointLabelGridLimit(ZoomFunction.maxZoom(9, 4))
-				// .setPointLabelGridLimit(ZoomFunction.maxZoom(10, 8))
-				// .setPointLabelGridLimit(ZoomFunction.maxZoom(11, 16))
-				// .setPointLabelGridLimit(ZoomFunction.maxZoom(12, 32))
-				// .setPointLabelGridLimit(ZoomFunction.maxZoom(12, 64))
-				// .setPointLabelGridLimit(ZoomFunction.maxZoom(13, 2048)) // practically unlimited
-
-
+				// FINE TUNING PROBABLY NECESSARY
 				.setPointLabelGridSizeAndLimit(
-				  12, // only limit at z12 and below
-				  64, // break the tile up into NxN px squares
-				  1 // any only keep the x nodes with lowest sort-key in each 32px square
+					12, // only limit at z12 and below
+					64, // break the tile up into NxN px squares
+					1 // any only keep the x nodes with lowest sort-key in each 32px square
 				)
 			 
 				.setBufferPixelOverrides(ZoomFunction.maxZoom(12, 64))
@@ -99,8 +100,6 @@ public class Extractor implements Profile {
 	}
 
 	static void run(Arguments args) throws Exception {
-		// Planetiler is a convenience wrapper around the lower-level API for the most common use-cases.
-		// See ToiletsOverlayLowLevelApi for an example using this same profile but the lower-level API
 		Planetiler.create(args)
 			.setProfile(new Extractor())
 			.addOsmSource("osm", Path.of("../input", "austria-latest.osm.pbf"), "")
