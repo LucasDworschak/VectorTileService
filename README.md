@@ -4,20 +4,24 @@ This repository provides the mean and manual to convert an osm file into vector 
 
 ## Steps that our program is doing
 
-1. (TODO) download the appropriate osm file (e.g. https://download.geofabrik.de/europe/austria-latest.osm.pbf)
+1. download the appropriate osm file (e.g. https://download.geofabrik.de/europe/austria-latest.osm.pbf)
 2. extract only the features we want to display in our vector tiles
 3. convert the resulting feature specific osm file into vector tiles using planetiler
 
 
 ## how to use
 
+0. download the appropriate osm map using 1_download.bat
+
 1. change the extractor java code to your liking
-2. execute build.sh (to create the jar)
-3. execute extract.sh (to extract your data into a .pmtiles)
-4. execute server.sh (to provide the tiles (uses your local computer as the server))
+2. execute 2_build.sh (to create the jar)
+3. execute 3_extract.sh (to extract your data into a .pmtiles)
+4. execute 4_server.sh (to provide the tiles (uses your local computer as the server))
 4. alternative - move .pmtiles to desired server where they are served
 
-
+Note:
+all.bat / all.sh can be used for quickly changing something in the extractor.java file and seeing the results. 
+Before using all.bat make sure that you have downloaded the latest map using the download.bat
 
 ## server
 
